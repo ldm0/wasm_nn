@@ -12,7 +12,8 @@ jobs:
 
     - name: "WASM build"
       run: |
-        cargo build
+        
+        cargo build --target=wasm32-unknown-unknown
 
     - name: "WASM test"
       run: |
