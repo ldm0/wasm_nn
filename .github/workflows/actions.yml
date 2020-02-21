@@ -1,0 +1,19 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: "WASM build"
+      run: |
+        cargo build
+
+    - name: "WASM test"
+      run: |
+        cargo test
