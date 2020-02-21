@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>wasm with rust for single layer neural netowrk</title>
+        <script src="./index.js" defer></script>
+    </head>
+    <body>
+        <div>Single layer of fully connected neural netowrk <br/> Powered by WebAssembly compiled from Rust and ♥</div>
+        <div>
+            <canvas id="main_canvas">main_canvas</canvas>
+        </div>
+        <div>
+            <button id="control_button" style="width: 256px; height: 100px;">start</button>
+        </div>
+        <div id = "loss_reveal">
+            loss: NaN
+        </div>
+        <!--
+        <div>
+            <input id="input_data_radius"></input>
+        </div>
+        -->
+        <div>
+            <input id="input_data_spin_span" value="3.1415926535">arm rotate angle</input>
+        </div>
+        <div>
+            <input id="input_data_num" value="500">overall number of data points</input>
+        </div>
+        <div>
+            <input id="input_num_classes" value="5">num of label</input>
+        </div>
+        <div>
+            <input id="input_data_gen_rand_max" value="0.25">maximum data random offset</input>
+        </div>
+        <div>
+            <input id="input_network_gen_rand_max" value="0.1">maximum network weight random offset</input>
+        </div>
+        <div>
+            <input id="input_fc_size" value="100">size of full connected layer</input>
+        </div>
+        <div>
+            <input id="input_descent_rate" value="0.5">network training descent rate</input>
+        </div>
+        <div>
+            <input id="input_regular_rate" value="0.001">network regular rate</input>
+        </div>
+    </body>
+</html>

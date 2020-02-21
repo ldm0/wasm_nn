@@ -1,0 +1,1 @@
+Attention: you need a http server to run locally. Because request of wasm is not supported by browser file request。
