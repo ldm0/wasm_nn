@@ -4,17 +4,14 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: windows-latest
-
     steps:
     - uses: actions/checkout@v1
-
     - name: "WASM build"
       run: |
-        
+        rustup target add wasm32-unknown-unknown
         cargo build --target=wasm32-unknown-unknown
-
     - name: "WASM test"
       run: |
+        rustup target add wasm32-unknown-unknown
         cargo test
