@@ -36,7 +36,6 @@ extern "C" {
 }
 
 lazy_static! {
-    // We usually retrieve these three things together, so just use the flag as 
     static ref DATA: Mutex<CriticalSection> = Mutex::default();
 }
 

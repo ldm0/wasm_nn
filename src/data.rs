@@ -1,12 +1,12 @@
 use ndarray::prelude::*;
-use ndarray::{Array2, Array1, Array, Axis, stack}; // for matrices
+use ndarray::{Array2, Array1, Array, Axis, stack};  // for matrices
 
-use ndarray_rand::RandomExt;                    // for randomness
-use ndarray_rand::rand_distr::StandardNormal;   // for randomness
-use rand::SeedableRng;                          // for from_seed
-use rand::rngs::SmallRng;                       // for randomness
+use ndarray_rand::RandomExt;                        // for randomness
+use ndarray_rand::rand_distr::StandardNormal;       // for randomness
+use rand::SeedableRng;                              // for from_seed
+use rand::rngs::SmallRng;                           // for randomness
 
-use std::f32::consts::PI;               // for math functions
+use std::f32::consts::PI;                           // for math functions
 
 /**
  * point data with labels
