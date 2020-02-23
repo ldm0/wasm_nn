@@ -1,1 +1,5 @@
-Attention: you need a http server to run locally. Because request of wasm is not supported by browser file request。
+Rust + WebAssembly + Neural Network
+
+Try to run Neural Network on web browser.
+
+**Attention: you need a http server to run locally. Because cross-origin requests are not supported for the file protocol scheme.**
