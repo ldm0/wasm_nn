@@ -79,7 +79,7 @@ async function main(){
         return env;
     }
 
-    const kernel_stream = await fetch("./wasm_nn.wasm");
+    const kernel_stream = await fetch("../wasm/wasm_nn.wasm");
     const kernel = await WebAssembly.instantiateStreaming(kernel_stream, { env: envs()});
     
     const {alloc: kernel_alloc, free: kernel_free} = kernel.instance.exports;
