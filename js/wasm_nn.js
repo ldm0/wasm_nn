@@ -93,12 +93,12 @@ async function main(){
     // Maybe not completed forever...
     //kernel_free(canvas_buffer_ptr, buffer_size);
     const canvas_buffer_ptr = kernel_alloc(canvas_buffer_size);
-    const canvas_buffer_array = new Uint8ClampedArray(memory.buffer, canvas_buffer_ptr, canvas_buffer_size);
-    const canvas_image_data = new ImageData(canvas_buffer_array, canvas_width, canvas_height)
 
     function draw_frame() {
         // multiply 1.1 for spadding
         kernel_draw_prediction(canvas_buffer_ptr, canvas_width, canvas_height, data_span_radius * 2);
+        const canvas_buffer_array = new Uint8ClampedArray(memory.buffer, canvas_buffer_ptr, canvas_buffer_size);
+        const canvas_image_data = new ImageData(canvas_buffer_array, canvas_width, canvas_height)
         canvas_context.putImageData(canvas_image_data, 0, 0);
 
         kernel_draw_points(canvas_width, canvas_height, data_span_radius * 2);
