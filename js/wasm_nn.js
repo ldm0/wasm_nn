@@ -1,22 +1,22 @@
-// from 0 to 1
+// Ratio: [0., 1.)
 function hue(ratio) {
     let rgb = "";
     let hue = 6 * ratio;
     let integer_part = Math.floor(hue);
     let fractal_part = Math.round((hue - integer_part) * 255);
     switch (integer_part) {
-    case 0: rgb = "#" + "FF" + zero_fill(fractal_part) + "00";          break;
-    case 1: rgb = "#" + zero_fill(255 - fractal_part) + "FF" + "00";    break;
-    case 2: rgb = "#" + "00" + "FF" + zero_fill(fractal_part);          break;
-    case 3: rgb = "#" + "00" + zero_fill(255 - fractal_part) + "FF";    break;
-    case 4: rgb = "#" + zero_fill(fractal_part) + "00" + "FF";          break;
-    case 5: rgb = "#" + "FF" + "00" + zero_fill(255 - fractal_part);    break;
+    case 0: rgb = "#" + "FF" + zero_padding(fractal_part) + "00";          break;
+    case 1: rgb = "#" + zero_padding(255 - fractal_part) + "FF" + "00";    break;
+    case 2: rgb = "#" + "00" + "FF" + zero_padding(fractal_part);          break;
+    case 3: rgb = "#" + "00" + zero_padding(255 - fractal_part) + "FF";    break;
+    case 4: rgb = "#" + zero_padding(fractal_part) + "00" + "FF";          break;
+    case 5: rgb = "#" + "FF" + "00" + zero_padding(255 - fractal_part);    break;
     }
     return rgb;
 }
 
-//zero fill the num's hex string
-function zero_fill(num) {
+// Number to zero-padding hex string
+function zero_padding(num) {
     let result = Math.round(num).toString(16);
     if (result.length < 2)
         result = "0" + result;
@@ -27,10 +27,11 @@ async function main(){
     const canvas_width = 256;
     const canvas_height = 256;
     const canvas_buffer_size = canvas_width * canvas_height * 4;
-
     const data_span_radius = 1.;
 
     const canvas = document.getElementById("main_canvas");
+    const canvas_context = canvas.getContext("2d");
+
     const control_button = document.getElementById("control_button");
     const loss_reveal = document.getElementById("loss_reveal");
     const input_data_spin_span = document.getElementById("input_data_spin_span");
@@ -41,8 +42,6 @@ async function main(){
     const input_fc_size = document.getElementById("input_fc_size");
     const input_descent_rate = document.getElementById("input_descent_rate");
     const input_regular_rate = document.getElementById("input_regular_rate");
-
-    const canvas_context = canvas.getContext("2d");
 
     function get_settings() {
         let settings = [
@@ -58,10 +57,8 @@ async function main(){
         return settings;
     }
 
-    canvas.width = canvas_width;
-    canvas.height = canvas_height;
-
     function envs() {
+        // For debug
         function log_u64(x) {
             console.log(x);
         }
@@ -102,8 +99,6 @@ async function main(){
     function draw_frame() {
         // multiply 1.1 for spadding
         kernel_draw_prediction(canvas_buffer_ptr, canvas_width, canvas_height, data_span_radius * 2);
-        // TODO: firefox failed here
-        // the canvas_buffer_ptr maybe is null
         canvas_context.putImageData(canvas_image_data, 0, 0);
 
         kernel_draw_points(canvas_width, canvas_height, data_span_radius * 2);
@@ -122,23 +117,11 @@ async function main(){
             settings[6],
             settings[7],
         );
-
-        /*
-        kernel_init(
-            1.,         // data_radius
-            3.14159,    // data_spin_span
-            500,        // data_num
-            10,         // num_classes
-            0.25,       // data_gen_rand_max
-            0.1,        // network_gen_rand_max
-            100,        // fc_size
-            .5,         // descent_rate
-            0.001       // regular_rate
-        );
-        */
         // draw a fram to avoid blank canvas 
         draw_frame();
     }
+
+    nninit(get_settings());
 
     {
         let run = false;
@@ -172,8 +155,6 @@ async function main(){
     {
         let run = false;
         let current_settings = get_settings();
-
-        nninit(current_settings);
 
         control_button.onclick = () => {
             if (run) {
