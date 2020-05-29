@@ -1,24 +1,24 @@
-mod nn;
 mod data;
+mod nn;
 
 use std::mem;
 use std::slice;
 //use std::os::raw::{/*c_double, c_int, */c_void};    // for js functions imports
-use std::sync::Mutex;                   // for lazy_static
-use lazy_static::lazy_static;           // for global variables
+use lazy_static::lazy_static;
+use std::sync::Mutex; // for lazy_static // for global variables
 
 use ndarray::prelude::*;
-use ndarray::{Array, Array1, Array3, Axis, array, Zip};
+use ndarray::{array, Array, Array1, Array3, Axis, Zip};
 
-use nn::Network;
 use data::Data;
+use nn::Network;
 
 #[derive(Default)]
 struct MetaData {
     fc_size: u32,
     num_classes: u32,
     descent_rate: f32,
-    regular_rate: f32
+    regular_rate: f32,
 }
 
 #[derive(Default)]
@@ -50,7 +50,7 @@ pub fn alloc(size: u32) -> *mut u8 {
 
 #[no_mangle]
 pub fn free(buffer_ptr: *mut u8, size: u32) {
-    let _  = unsafe { Vec::from_raw_parts(buffer_ptr, 0, size as usize) };
+    let _ = unsafe { Vec::from_raw_parts(buffer_ptr, 0, size as usize) };
 }
 
 #[no_mangle]
@@ -63,19 +63,25 @@ pub fn init(
     network_gen_rand_max: f32,
     fc_size: u32,
     descent_rate: f32,
-    regular_rate: f32
+    regular_rate: f32,
 ) {
     // Thanks rust compiler :-/
     let ref mut tmp = *DATA.lock().unwrap();
     let CriticalSection(metadata, data, network) = tmp;
 
-    metadata.fc_size        = fc_size;
-    metadata.num_classes    = num_classes;
-    metadata.descent_rate   = descent_rate;
-    metadata.regular_rate   = regular_rate;
+    metadata.fc_size = fc_size;
+    metadata.num_classes = num_classes;
+    metadata.descent_rate = descent_rate;
+    metadata.regular_rate = regular_rate;
 
-    // Num of each data class is the same 
-    data.init(num_classes, data_num / num_classes, data_radius, data_spin_span, data_gen_rand_max);
+    // Num of each data class is the same
+    data.init(
+        num_classes,
+        data_num / num_classes,
+        data_radius,
+        data_spin_span,
+        data_gen_rand_max,
+    );
 
     // Input of this network is two dimension points
     // output label is sparsed num_classes integer
@@ -86,14 +92,20 @@ pub fn init(
 #[no_mangle]
 pub fn train() -> f32 {
     let ref mut tmp = *DATA.lock().unwrap();
-    // Jesus, thats magic 
+    // Jesus, thats magic
     let CriticalSection(ref metadata, ref data, ref mut network) = *tmp;
 
     let regular_rate = metadata.regular_rate;
     let descent_rate = metadata.descent_rate;
 
     let (fc_layer, softmax) = network.forward_propagation(&data.points);
-    let (dw1, db1, dw2, db2) = network.back_propagation(&data.points, &fc_layer, &softmax, &data.labels, regular_rate);
+    let (dw1, db1, dw2, db2) = network.back_propagation(
+        &data.points,
+        &fc_layer,
+        &softmax,
+        &data.labels,
+        regular_rate,
+    );
     let loss = network.loss(&softmax, &data.labels, regular_rate);
     network.descent(&dw1, &db1, &dw2, &db2, descent_rate);
 
@@ -131,7 +143,7 @@ pub fn draw_prediction(canvas: *mut u8, width: u32, height: u32, span_least: f32
     let x_axis: Array1<f32> = Array::linspace(width_min, width_max, width);
     let y_axis: Array1<f32> = Array::linspace(height_min, height_max, height);
 
-    // coordination 
+    // coordination
     let mut grid: Array3<f32> = Array::zeros((height, width, 2));
     for y in 0..height {
         for x in 0..width {
@@ -158,7 +170,7 @@ pub fn draw_prediction(canvas: *mut u8, width: u32, height: u32, span_least: f32
     let grid_label = labels.into_shape((height, width)).unwrap();
 
     let canvas_size = width * height * 4;
-    let canvas: &mut [u8] = unsafe{slice::from_raw_parts_mut(canvas, canvas_size)};
+    let canvas: &mut [u8] = unsafe { slice::from_raw_parts_mut(canvas, canvas_size) };
     for y in 0..height {
         for x in 0..width {
             // assume rgba
@@ -197,11 +209,13 @@ pub fn draw_points(width: u32, height: u32, span_least: f32) {
                 let x = x as u32;
                 let y = y as u32;
                 let label_ratio = label as f32 / num_classes;
-                unsafe { draw_point(x, y, label_ratio); }
+                unsafe {
+                    draw_point(x, y, label_ratio);
+                }
             }
         });
 }
- 
+
 #[cfg(test)]
 mod kernel_test {
     use super::*;
@@ -216,7 +230,7 @@ mod kernel_test {
         *POINT_DRAW_TIMES.lock().unwrap() += 1;
     }
 
-    use std::f32::consts::PI;               // for math functions
+    use std::f32::consts::PI; // for math functions
 
     const DATA_GEN_RADIUS: f32 = 1f32;
     const SPIN_SPAN: f32 = PI;
@@ -230,7 +244,17 @@ mod kernel_test {
 
     #[test]
     fn test_all() {
-        init(DATA_GEN_RADIUS, SPIN_SPAN, DATA_NUM, NUM_CLASSES, DATA_GEN_RAND_MAX, NETWORK_GEN_RAND_MAX, FC_SIZE, DESCENT_RATE, REGULAR_RATE);
+        init(
+            DATA_GEN_RADIUS,
+            SPIN_SPAN,
+            DATA_NUM,
+            NUM_CLASSES,
+            DATA_GEN_RAND_MAX,
+            NETWORK_GEN_RAND_MAX,
+            FC_SIZE,
+            DESCENT_RATE,
+            REGULAR_RATE,
+        );
         let loss_before: f32 = train();
         for _ in 0..50 {
             let loss = train();
@@ -246,7 +270,17 @@ mod kernel_test {
 
     #[test]
     fn test_draw_prediction() {
-        init(DATA_GEN_RADIUS, SPIN_SPAN, DATA_NUM, NUM_CLASSES, DATA_GEN_RAND_MAX, NETWORK_GEN_RAND_MAX, FC_SIZE, DESCENT_RATE, REGULAR_RATE);
+        init(
+            DATA_GEN_RADIUS,
+            SPIN_SPAN,
+            DATA_NUM,
+            NUM_CLASSES,
+            DATA_GEN_RAND_MAX,
+            NETWORK_GEN_RAND_MAX,
+            FC_SIZE,
+            DESCENT_RATE,
+            REGULAR_RATE,
+        );
         let width = 100;
         let height = 100;
         let buffer = alloc(width * height * 4);
@@ -260,7 +294,17 @@ mod kernel_test {
 
         // span_least * 1.1 for padding
 
-        init(DATA_GEN_RADIUS, SPIN_SPAN, DATA_NUM, NUM_CLASSES, DATA_GEN_RAND_MAX, NETWORK_GEN_RAND_MAX, FC_SIZE, DESCENT_RATE, REGULAR_RATE);
+        init(
+            DATA_GEN_RADIUS,
+            SPIN_SPAN,
+            DATA_NUM,
+            NUM_CLASSES,
+            DATA_GEN_RAND_MAX,
+            NETWORK_GEN_RAND_MAX,
+            FC_SIZE,
+            DESCENT_RATE,
+            REGULAR_RATE,
+        );
 
         // test small resolution drawing
         *POINT_DRAW_TIMES.lock().unwrap() = 0;
