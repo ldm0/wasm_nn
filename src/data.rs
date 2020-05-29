@@ -8,9 +8,7 @@ use rand::SeedableRng; // for from_seed // for randomness
 
 use std::f32::consts::PI; // for math functions
 
-/**
- * point data with labels
- */
+/// point data with labels
 #[derive(Default)]
 pub struct Data {
     pub points: Array2<f32>, // points position

@@ -4,7 +4,7 @@ mod nn;
 use std::mem;
 use std::slice;
 //use std::os::raw::{/*c_double, c_int, */c_void};    // for js functions imports
-use lazy_static::lazy_static;
+use once_cell::sync::Lazy;
 use std::sync::Mutex; // for lazy_static // for global variables
 
 use ndarray::prelude::*;
@@ -35,9 +35,7 @@ extern "C" {
     fn draw_point(x: u32, y: u32, label_ratio: f32);
 }
 
-lazy_static! {
-    static ref DATA: Mutex<CriticalSection> = Mutex::default();
-}
+static DATA: Lazy<Mutex<CriticalSection>> = Lazy::new(|| Mutex::default());
 
 #[no_mangle]
 // This function returns the offset of the allocated buffer in wasm memory
@@ -220,9 +218,7 @@ pub fn draw_points(width: u32, height: u32, span_least: f32) {
 mod kernel_test {
     use super::*;
 
-    lazy_static! {
-        static ref POINT_DRAW_TIMES: Mutex<u32> = Mutex::new(0);
-    }
+    static POINT_DRAW_TIMES: Lazy<Mutex<u32>> = Lazy::new(|| Mutex::new(0));
 
     // Override the extern functions
     #[no_mangle]
