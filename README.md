@@ -6,4 +6,4 @@ Try to run Neural Network on web browser.
 
 **Attention: you need a http server to run locally. Because cross-origin requests are not supported for the file protocol scheme.**
 
-Demo page: https://ldm0.xyz/wasm_nn.html
+Demo page: https://ldm0.com/wasm_nn.html
